@@ -99,6 +99,9 @@ grails:
 
 ---
 grails:
+    config:
+        locations:
+           - file:/home/aaron/myconfig.yml
     plugin:
         databasemigration:
             updateOnStart: true
@@ -112,8 +115,8 @@ dataSource:
     pooled: true
     jmxExport: true
     driverClassName: org.mariadb.jdbc.Driver
-    username: aaron
-    password: splatt66
+    username: baduser
+    password: badpassword
     dbCreate: none
     dialect: org.hibernate.dialect.MariaDBDialect
 environments:
