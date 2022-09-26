@@ -1,6 +1,6 @@
 package com.bracket
 
-class GemericDomainObject implements Serializable {
+class GenericDomainObject implements Serializable {
 
     String id
 
