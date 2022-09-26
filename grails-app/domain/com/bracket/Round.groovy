@@ -3,6 +3,7 @@ package com.bracket
 class Round extends GenericDomainObject {
 
     String name
+    Integer sortOrder
 
     static hasMany = [rounds: TeamGame]
 
@@ -13,6 +14,7 @@ class Round extends GenericDomainObject {
     static mapping = {
         version false
         id generator: 'assigned'
+        sort "sortOrder"
     }
 
     @Override

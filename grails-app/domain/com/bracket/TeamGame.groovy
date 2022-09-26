@@ -14,6 +14,8 @@ class TeamGame extends GenericDomainObject{
     static mapping = {
         version false
         id generator: 'assigned'
+        sort "round"
+        round sort: "sortOrder"
     }
 
     static belongsTo = [homeTeam:Team, awayTeam: Team, round: Round, winner: Team, loser:Team]
