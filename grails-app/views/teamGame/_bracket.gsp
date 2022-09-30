@@ -13,10 +13,10 @@
             </g:if>
             <g:else>
                 <div class="player <g:if test="${i == 0}">top</g:if><g:else>bot</g:else>">${sortedTeams[i]}
-                    <div class="score"><input name="${sortedTeams[i].id}" type="number" value="0" required></div>
+                    <div class="score"><input name="${sortedTeams[i].id}" type="number" value="" required></div>
                 </div>
                 <div  class="player bot">${sortedTeams[totalTeams - i - Integer.valueOf(minus.toString())]}
-                    <div class="score"><input name="${sortedTeams[totalTeams- i -Integer.valueOf(minus.toString())].id}" type="number" value="0" required></div>
+                    <div class="score"><input name="${sortedTeams[totalTeams- i -Integer.valueOf(minus.toString())].id}" type="number" value="" required></div>
                 </div>
             </g:else>
         </div>
