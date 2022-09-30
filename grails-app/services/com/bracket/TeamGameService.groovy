@@ -22,9 +22,9 @@ class TeamGameService {
             teamList.each { Team awayTeamObj ->
                 Round roundObj = findRound(homeTeamObj, awayTeamObj)
                 if (homeTeamObj.homeGames.size() >= half) {
-                    TeamGame.findOrSaveWhere(awayTeam: homeTeamObj, homeTeam: awayTeamObj, awayScore: 0, homeScore: 0, round: roundObj).save(flush: true)
+                    TeamGame.findOrSaveWhere(awayTeam: homeTeamObj, homeTeam: awayTeamObj, awayScore: null, homeScore: null, round: roundObj).save(flush: true)
                 } else {
-                    TeamGame.findOrSaveWhere(awayTeam: awayTeamObj, homeTeam: homeTeamObj, awayScore: 0, homeScore: 0, round: roundObj).save(flush: true)
+                    TeamGame.findOrSaveWhere(awayTeam: awayTeamObj, homeTeam: homeTeamObj, awayScore: null, homeScore: null, round: roundObj).save(flush: true)
                 }
                 homeTeamObj.refresh()
                 awayTeamObj.refresh()
@@ -171,8 +171,12 @@ class TeamGameService {
     def saveItems(itemList) {
         itemList.each {
             TeamGame game = TeamGame.findById(it.id)
-            game.awayScore = it.awayScore.toInteger()
-            game.homeScore = it.homeScore.toInteger()
+            try {
+                game.awayScore = it.awayScore.toInteger()
+            } catch ( Exception e) {}
+            try {
+                game.homeScore = it.homeScore.toInteger()
+            } catch ( Exception e) {}
             game.winner = game.awayScore > game.homeScore ? game.awayTeam : ( game.awayScore < game.homeScore ? game.homeTeam : null )
             game.loser = game.winner && game.winner == game.homeTeam ? game.awayTeam : (game.winner ? game.awayTeam : null)
             game.save(flush:true)
