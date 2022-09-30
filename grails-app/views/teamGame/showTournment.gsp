@@ -17,20 +17,12 @@
      </tr>
     </g:each>
 </table>
-<button id="save">Save</button>
-
+<button id="save" type="button" class="btn btn-primary">Save</button>
+<button id="contTournment" type="button" class="btn btn-secondary">Continue Tournment</button>
 <script>
     $("#save").on('click',function() {
-        let constarty = [];
-        $.each($("tr"),
-            function(index,value) {
-                if($(value).attr('id')) {
-                    let dataParts = '{"homeScore":"' + $(value).find('select[name="homeSore"]').val() + '","awayScore" : "' +  $(value).find('select[name="awaySore"]').val() + '", "id" : "' + $(value).attr('id') + '"}';
-                    constarty.push(dataParts);
-                }
-            });
-        let strData = "["  +  constarty.join(',') + "]"
-        let data = {"items": strData}
+
+        let data = {"items": gatherData()}
             $.ajax({
                 method: "POST",
                 url: "/teamGame/saveRound",
@@ -39,6 +31,28 @@
                 window.location.reload();
             });
     });
+    $("#contTournment").on('click',function() {
+
+        let data = {"items": gatherData()}
+        $.ajax({
+            method: "POST",
+            url: "/teamGame/saveRound",
+            data: data
+        }).done(function() {
+            window.location.href = '/teamGame/resumeTournment'
+        });
+    });
+    function gatherData() {
+        let constarty = [];
+        $.each($("tr"),
+            function(index,value) {
+                if($(value).attr('id')) {
+                    let dataParts = '{"homeScore":"' + $(value).find('select[name="homeSore"]').val() + '","awayScore" : "' +  $(value).find('select[name="awaySore"]').val() + '", "id" : "' + $(value).attr('id') + '"}';
+                    constarty.push(dataParts);
+                }
+            });
+        return "["  +  constarty.join(',') + "]"
+    }
 </script>
 
 </body>

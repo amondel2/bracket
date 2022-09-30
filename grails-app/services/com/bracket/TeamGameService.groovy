@@ -1,14 +1,17 @@
 package com.bracket
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 
 @Transactional
 class TeamGameService {
-    Integer numberOfBoards = 4;
+    GrailsApplication grailsApplication
+
 
     def dropGames() {
         Round.deleteAll(Round.list())
         TeamGame.deleteAll(TeamGame.list())
+        TournmentTracker.deleteAll(TournmentTracker.list())
     }
 
     def createRoundRobin() {
@@ -28,6 +31,7 @@ class TeamGameService {
             }
         }
         Round.list().each { Round rndObj ->
+            Integer numberOfBoards = grailsApplication.config.getProperty('numBoards')
             if (TeamGame.countByRound(rndObj) != numberOfBoards) {
                 TeamGame.findAllByRound(rndObj).each { TeamGame tmObj ->
                     for (Round rnditObj in Round.list()) {
@@ -76,6 +80,7 @@ class TeamGameService {
         def teamRound
         Integer round = 0
         Round roundObj
+        Integer numberOfBoards = grailsApplication.config.getProperty('numBoards')
         do {
             roundObj = Round.findOrSaveWhere(name: "${++round}", sortOrder: round).save(flush: true)
             teamRound = TeamGame.withCriteria {
@@ -172,5 +177,75 @@ class TeamGameService {
             game.loser = game.winner && game.winner == game.homeTeam ? game.awayTeam : (game.winner ? game.awayTeam : null)
             game.save(flush:true)
         }
+    }
+
+    Boolean hasSavedTournments() {
+        TournmentTracker.count() > 0
+    }
+
+    def resumeTournment() {
+        List<Team> firstTimeLosers = []
+        List<Team> winners = []
+        Team.list().each { Team te ->
+            if(te.tourney_loses.size() == 0 ) {
+                winners.push(te)
+            } else if (te.tourney_loses.size() == 1 ) {
+                firstTimeLosers.push(te)
+            }
+        }
+        renderResults(winners,firstTimeLosers)
+    }
+
+    def renderResults( List<Team> winners,  List<Team> firstTimeLosers) {
+        if (winners.size() == 1 && firstTimeLosers.size() == 0) {
+            winners[0]
+        } else if(winners.size() == 0 && firstTimeLosers.size() == 1 ) {
+            firstTimeLosers[0]
+        } else if(winners.size() == 1 && firstTimeLosers.size() == 1 ) {
+            [teamsSort(winners + firstTimeLosers )]
+        }  else {
+            [teamsSort(winners), teamsSort(firstTimeLosers)]
+        }
+    }
+
+    def getNextRound(itemList){
+        List<Team> firstTimeLosers = []
+        List<Team> winners = []
+        itemList.each{
+            Team loser,winner
+            Integer winnerScore, loserScore
+            if(it.team1.score >= it.team2.score) {
+                winner = Team.findById(it.team1.id)
+                loser = Team.findById(it.team2.id)
+                winnerScore = Integer.valueOf(it.team1.score)
+                loserScore = Integer.valueOf(it.team2.score)
+            } else {
+                winner = Team.findById(it.team2.id)
+                loser = Team.findById(it.team1.id)
+                winnerScore = Integer.valueOf(it.team2.score)
+                loserScore = Integer.valueOf(it.team1.score)
+            }
+            if(winner.tourney_loses?.size() > 0 ) {
+                firstTimeLosers.push(winner)
+            }  else {
+                winners.push(winner)
+            }
+            if (loser && loser?.tourney_loses?.size() == 0) {
+                firstTimeLosers.push(loser)
+            }
+            TournmentTracker.findOrSaveWhere(winner: winner, loser: loser, winerScore: winnerScore, loserScore: loserScore)
+        }
+        renderResults(winners,firstTimeLosers)
+    }
+
+    def createBracket() {
+        teamsSort(Team.list())
+    }
+
+    def teamsSort(List<Team> teamList) {
+        teamList.sort{x,y ->
+            x.wins.size() ==y.wins.size() ?  (TeamGame.findAllByHomeTeam(y).sum{ it.homeScore}  + TeamGame.findAllByAwayTeam(y).sum{ it.awayScore}) <=> (TeamGame.findAllByHomeTeam(x).sum{ it.homeScore}  + TeamGame.findAllByAwayTeam(x).sum{ it.awayScore}) : y.wins.size() <=> x.wins.size()
+        }
+        teamList
     }
 }

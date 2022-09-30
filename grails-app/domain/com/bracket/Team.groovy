@@ -4,8 +4,8 @@ class Team extends GenericDomainObject{
 
     String name
 
-    static hasMany = [homeGames:TeamGame,awayGames:TeamGame,wins:TeamGame,losses:TeamGame]
-    static mappedBy = [homeGames: 'homeTeam',awayGames: 'awayTeam',wins: 'winner', losses: 'loser']
+    static hasMany = [homeGames:TeamGame,awayGames:TeamGame,wins:TeamGame,losses:TeamGame,tourney_wins:TournmentTracker,tourney_loses:TournmentTracker]
+    static mappedBy = [homeGames: 'homeTeam',awayGames: 'awayTeam',wins: 'winner', losses: 'loser',tourney_loses:'loser',tourney_wins:'winner']
     static constraints = {
         name blank:false, nullable: false, unique: true
     }

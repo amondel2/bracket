@@ -106,6 +106,7 @@ grails:
         databasemigration:
             updateOnStart: true
             updateOnStartFileName: changelog.groovy
+numBoards: 4
 hibernate:
     cache:
         queries: false
