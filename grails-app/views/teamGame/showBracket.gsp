@@ -106,6 +106,8 @@ ${raw(bracketHtml)}
             }).done(function (data) {
                 $("#showFrm").html(data);
             });
+        } else {
+            alert("Fill out the Form");
         }
     });
 
