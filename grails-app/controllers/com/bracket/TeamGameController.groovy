@@ -16,7 +16,7 @@ class TeamGameController {
     }
 
     def showTournment() {
-        render view:'showTournment', model:[tournmanet:teamGameService.getRounds(params.order)]
+        render view:'showTournment', model:[tournmanet:teamGameService.getRounds()]
     }
 
     def saveRound() {

@@ -4,23 +4,46 @@
     <g:applyLayout name="main" />
     <title>Tournament</title>
 </head>
+<style>
+.buttonDiv {
+    height: 50px;
+}
+.scrollableForm {
+    height: calc(100% - 50px);
+    overflow-y: scroll;
+    border-bottom: 2px solid;
+    margin-bottom: 7px;
+}
+.roundDiv {
+    display: inline-grid;
+    margin: 0px 10px 10px 10px;
 
+}
+</style>
 <body>
+<div class="scrollableForm flex-box">
 <form id="checkfrm" onsubmit="return false;">
-<table>
-    <tr><g:sortableColumn property="round" title="Round"  titleKey="teamGame.round.name" /><th>Team 1</th><th>Team 2</th><th id="team1score">Team 1 Score</th><th id="team2Score">Team 2 Score</th><th>Winner</th></tr>
-    <g:each in="${tournmanet}" var="teamGame">
-     <tr id="${teamGame.id}">
-        <td>${teamGame.round.name}</td><td>${teamGame.homeTeam}</td><td>${teamGame.awayTeam}</td>
-         <td><input type="number" max="25" min="0" step="1" required aria-required="true" aria-labelledby="team1score" name="homeSore" value="${teamGame.homeScore}"/></td>
-         <td><input type="number" max="25" min="0" step="1" required aria-required="true" aria-labelledby="team2Score" name="awaySore" value="${teamGame.awayScore}"/></td>
-         <td>${teamGame.winner}</td>
-     </tr>
-    </g:each>
-</table>
+<g:each in="${tournmanet}" var="teamRound">
+    <div class="roundDiv">
+        <h2>Round ${teamRound[0].round.name}</h2>
+        <table>
+            <tr><th>Team 1</th><th>Team 2</th><th>Winner</th></tr>
+            <g:each in="${teamRound}" var="teamGame">
+             <tr id="${teamGame.id}">
+                 <td>${teamGame.homeTeam}<br><input type="number" max="25" min="0" step="1" required aria-required="true" aria-labelledby="team1score" name="homeSore" value="${teamGame.homeScore}"/></td>
+                 <td>${teamGame.awayTeam}<br><input type="number" max="25" min="0" step="1" required aria-required="true" aria-labelledby="team2Score" name="awaySore" value="${teamGame.awayScore}"/></td>
+                 <td>${teamGame.winner}</td>
+             </tr>
+            </g:each>
+        </table>
+    </div>
+</g:each>
+</form>
+</div>
+<div class="buttonDiv">
 <button id="save" type="button" class="btn btn-primary">Save</button>
 <button id="contTournment" type="button" class="btn btn-secondary">Continue Tournament</button>
-</form>
+</div>
 <script>
     $("#save").on('click',function() {
         let data = {"items": gatherData()};

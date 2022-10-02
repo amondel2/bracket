@@ -31,11 +31,11 @@ class TeamGameService {
             }
         }
         Round.list().each { Round rndObj ->
-            Integer numberOfBoards = grailsApplication.config.getProperty('numBoards')
-            if (TeamGame.countByRound(rndObj) != numberOfBoards) {
+            Integer numberOfBoards = grailsApplication.config.getProperty('numBoards', Integer, 4)
+            if (TeamGame.countByRound(rndObj) > numberOfBoards) {
                 TeamGame.findAllByRound(rndObj).each { TeamGame tmObj ->
                     for (Round rnditObj in Round.list()) {
-                        if (TeamGame.countByRound(rnditObj) != numberOfBoards) {
+                        if (TeamGame.countByRound(rnditObj) > numberOfBoards) {
                             TeamGame teamRound = TeamGame.withCriteria {
                                 eq("round", rnditObj)
                                 or {
@@ -80,7 +80,7 @@ class TeamGameService {
         def teamRound
         Integer round = 0
         Round roundObj
-        Integer numberOfBoards = grailsApplication.config.getProperty('numBoards')
+        Integer numberOfBoards = grailsApplication.config.getProperty('numBoards', Integer, 4)
         do {
             roundObj = Round.findOrSaveWhere(name: "${++round}", sortOrder: round).save(flush: true)
             teamRound = TeamGame.withCriteria {
@@ -104,7 +104,7 @@ class TeamGameService {
 
 
         //see if we can put this in an earlier round
-        for (int roundSearch = 1; roundSearch <= roundObj.sortOrder; roundSearch++) {
+        for (int roundSearch = 1; roundSearch < roundObj.sortOrder; roundSearch++) {
             Round swapRound = Round.findBySortOrder(roundSearch)
             def searchRound = TeamGame.findAllByRound(swapRound)
             TeamGame teamSwap
@@ -160,11 +160,11 @@ class TeamGameService {
         roundObj
     }
 
-    def getRounds (def order) {
-        if(order && order == 'desc') {
-            TeamGame.list().sort { x, y -> y.round.sortOrder <=> x.round.sortOrder }
-        } else {
-            TeamGame.list().sort { x, y -> x.round.sortOrder <=> y.round.sortOrder }
+    def getRounds () {
+        Round.listOrderBySortOrder().collect {Round round ->
+            TeamGame.findAllByRound(round).collect {
+                it
+            }
         }
     }
 
